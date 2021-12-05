@@ -1,10 +1,12 @@
 package com.example.sweater.controller;
 
 import com.example.sweater.domain.Message;
+import com.example.sweater.domain.User;
 import com.example.sweater.repository.MessageRepository;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,10 +34,12 @@ public class MainController {
     }
 
     @PostMapping("/main")
-    public String add(@RequestParam String text,
-                      @RequestParam String tag,
-                      Map<String, Object> model) {
-        var message = new Message(text, tag);
+    public String add(
+            @AuthenticationPrincipal User user,
+            @RequestParam String text,
+            @RequestParam String tag,
+            Map<String, Object> model) {
+        var message = new Message(text, tag, user);
 
         messageRepository.save(message);
 
@@ -51,7 +55,7 @@ public class MainController {
                          Map<String, Object> model) {
         Iterable<Message> messages;
 
-        if(StringUtils.isNotBlank(filter)) {
+        if (StringUtils.isNotBlank(filter)) {
             messages = messageRepository.findByTag(filter);
         } else {
             messages = messageRepository.findAll();
