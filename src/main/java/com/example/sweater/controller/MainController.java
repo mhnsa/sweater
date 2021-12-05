@@ -13,37 +13,33 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Map;
 
 @Controller
-public class GreetingController {
+public class MainController {
 
     @Autowired
-    private MessageRepository repository;
+    private MessageRepository messageRepository;
 
-    @GetMapping("/greeting")
-    public String greeting(
-            @RequestParam(name = "name", required = false, defaultValue = "World") String name,
-            Map<String, Object> model) {
-
-        model.put("name", name);
+    @GetMapping("/")
+    public String greeting(Map<String, Object> model) {
         return "greeting";
     }
 
-    @GetMapping
+    @GetMapping("/main")
     public String main(Map<String, Object> model) {
-        Iterable<Message> messages = repository.findAll();
+        Iterable<Message> messages = messageRepository.findAll();
 
         model.put("messages", messages);
         return "main";
     }
 
-    @PostMapping
+    @PostMapping("/main")
     public String add(@RequestParam String text,
                       @RequestParam String tag,
                       Map<String, Object> model) {
         var message = new Message(text, tag);
 
-        repository.save(message);
+        messageRepository.save(message);
 
-        Iterable<Message> messages = repository.findAll();
+        Iterable<Message> messages = messageRepository.findAll();
 
         model.put("messages", messages);
 
@@ -56,9 +52,9 @@ public class GreetingController {
         Iterable<Message> messages;
 
         if(StringUtils.isNotBlank(filter)) {
-            messages = repository.findByTag(filter);
+            messages = messageRepository.findByTag(filter);
         } else {
-            messages = repository.findAll();
+            messages = messageRepository.findAll();
         }
         model.put("messages", messages);
 
